@@ -1,315 +1,125 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Be My Valentine?</title>
-  <style>
-    :root { --bg1:#ffe6f0; --bg2:#fff; --text:#2b2b2b; }
-    * { box-sizing: border-box; }
-    body{
-      margin:0; min-height:100vh; overflow:hidden;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      color:var(--text);
-      background: radial-gradient(circle at 20% 20%, var(--bg2), var(--bg1));
-    }
-    .wrap{ min-height:100vh; display:grid; place-items:center; padding:24px; }
-    .card{
-      width:min(620px,92vw);
-      background: rgba(255,255,255,0.88);
-      border:1px solid rgba(0,0,0,0.06);
-      border-radius:24px;
-      box-shadow:0 18px 50px rgba(0,0,0,0.10);
-      padding:30px;
-      text-align:center;
-      position:relative;
-    }
-    h1{ margin:0 0 10px; font-size:clamp(28px,4vw,44px); letter-spacing:-0.02em; }
-    p{ margin:0 0 18px; opacity:0.85; }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Be My Valentine?</title>
+<style>
+:root { --bg1:#ffe6f0; --bg2:#fff; --text:#2b2b2b; }
+* { box-sizing: border-box; }
+body{
+margin:0; min-height:100vh; overflow:hidden;
+font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+color:var(--text);
+background: radial-gradient(circle at 20% 20%, var(--bg2), var(--bg1));
+}
+.wrap{ min-height:100vh; display:grid; place-items:center; padding:24px; }
+.card{
+width:min(620px,92vw);
+background: rgba(255,255,255,0.88);
+border:1px solid rgba(0,0,0,0.06);
+border-radius:24px;
+box-shadow:0 18px 50px rgba(0,0,0,0.10);
+padding:30px;
+text-align:center;
+position:relative;
+}
+h1{ margin:0 0 10px; font-size:clamp(28px,4vw,44px); letter-spacing:-0.02em; }
+p{ margin:0 0 18px; opacity:0.85; }
 
-    .btnRow{
-      position:relative;
-      height:84px;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:16px;
-      margin-top:18px;
-    }
-    button{
-      border:none;
-      border-radius:999px;
-      padding:14px 18px;
-      font-size:16px;
-      cursor:pointer;
-      box-shadow:0 10px 20px rgba(0,0,0,0.10);
-      transition: transform 0.12s ease;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-    #yesBtn{
-      background: linear-gradient(135deg, #ff4d8d, #ff2d55);
-      color:#fff;
-      min-width:130px;
-    }
-    #yesBtn:hover{ transform: translateY(-1px) scale(1.02); }
+.btnRow{
+position:relative;
+height:84px;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:16px;
+margin-top:18px;
+}
+button{
+border:none;
+border-radius:999px;
+padding:14px 18px;
+font-size:16px;
+cursor:pointer;
+box-shadow:0 10px 20px rgba(0,0,0,0.10);
+transition: transform 0.12s ease;
+user-select:none;
+-webkit-tap-highlight-color: transparent;
+touch-action: manipulation;
+}
+#yesBtn{
+background: linear-gradient(135deg, #ff4d8d, #ff2d55);
+color:#fff;
+min-width:130px;
+}
+#yesBtn:hover{ transform: translateY(-1px) scale(1.02); }
 
-    /* UPDATED: better positioning + performance hints */
-    #noBtn{
-      background:#f2f2f2;
-      color:#333;
-      min-width:130px;
-      position:absolute;
-      left: calc(50% + 90px);
-      top: 14px;
-      transform: translateX(-50%);
-      will-change: left, top, transform;
-    }
+#noBtn{
+background:#f2f2f2;
+color:#333;
+min-width:130px;
+position:absolute;
+left:50%;
+top:10px;
+transform: translateX(80px);
+}
 
-    /* “New page” section */
-    #lovePage{ display:none; }
-    .loveTitle{ font-size:clamp(34px,5vw,56px); margin:0 0 10px; }
-    .loveMsg{ font-size:clamp(18px,2.4vw,22px); margin:0; opacity:0.9; }
+/* “New page” section */
+#lovePage{ display:none; }
+.loveTitle{ font-size:clamp(34px,5vw,56px); margin:0 0 10px; }
+.loveMsg{ font-size:clamp(18px,2.4vw,22px); margin:0; opacity:0.9; }
 
-    /* Roses background */
-    #roses{
-      position:fixed; inset:0;
-      pointer-events:none;
-      display:none;
-      opacity:0.35;
-      font-size:28px; line-height:1;
-    }
-    #rosesGrid{
-      position:absolute; inset:-20px;
-      display:grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap:18px;
-      transform: rotate(-8deg);
-    }
-    #rosesGrid span{
-      display:grid; place-items:center;
-      animation: floaty 4s ease-in-out infinite;
-    }
-    #rosesGrid span:nth-child(3n){ animation-duration:5.2s; }
-    #rosesGrid span:nth-child(4n){ animation-duration:6.0s; }
-    @keyframes floaty{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+/* Roses background */
+#roses{
+position:fixed; inset:0;
+pointer-events:none;
+display:none;
+opacity:0.35;
+font-size:28px; line-height:1;
+}
+#rosesGrid{
+position:absolute; inset:-20px;
+display:grid;
+grid-template-columns: repeat(12, 1fr);
+gap:18px;
+transform: rotate(-8deg);
+}
+#rosesGrid span{
+display:grid; place-items:center;
+animation: floaty 4s ease-in-out infinite;
+}
+#rosesGrid span:nth-child(3n){ animation-duration:5.2s; }
+#rosesGrid span:nth-child(4n){ animation-duration:6.0s; }
+@keyframes floaty{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 
-    /* Confetti canvas */
-    #confetti{ position:fixed; inset:0; pointer-events:none; display:none; }
+/* Confetti canvas */
+#confetti{ position:fixed; inset:0; pointer-events:none; display:none; }
 
-    .hint{ margin-top:16px; font-size:12px; opacity:0.55; }
-  </style>
+.hint{ margin-top:16px; font-size:12px; opacity:0.55; }
+</style>
 </head>
 <body>
-  <canvas id="confetti"></canvas>
-  <div id="roses"><div id="rosesGrid"></div></div>
+<canvas id="confetti"></canvas>
+<div id="roses"><div id="rosesGrid"></div></div>
 
-  <div class="wrap">
-    <div class="card">
-      <div id="askPage">
-        <h1>Will you be my Valentine? 💘</h1>
-        <p>(Try saying “No” 😄)</p>
+<div class="wrap">
+<div class="card">
+<div id="askPage">
+<h1>Will you be my Valentine? 💘</h1>
+<p>(Try saying “No” 😄)</p>
 
-        <div class="btnRow" id="btnRow">
-          <button id="yesBtn">Yes 💖</button>
-          <button id="noBtn" aria-label="No button">No 🙈</button>
-        </div>
+<div class="btnRow" id="btnRow">
+<button id="yesBtn">Yes 💖</button>
+<button id="noBtn" aria-label="No button">No 🙈</button>
+</div>
 
-        <div class="hint">On mobile, try tapping “No” 😉</div>
-      </div>
+<div class="hint">On mobile, try tapping “No” 😉</div>
+</div>
 
-      <div id="lovePage">
+<div id="lovePage">
         <h1 class="loveTitle">YAY!! 🌹</h1>
-        <p class="loveMsg">I love you ❤️</p>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // --- NO button runs away (UPGRADED: proximity dodge + mobile-friendly pointer events) ---
-    const noBtn = document.getElementById("noBtn");
-    const btnRow = document.getElementById("btnRow");
-
-    let lastMove = 0;
-    const COOLDOWN_MS = 120;   // prevents jitter
-    const DODGE_RADIUS = 90;   // how close your cursor gets before it flees
-
-    function clamp(v, min, max) {
-      return Math.max(min, Math.min(max, v));
-    }
-
-    function moveNoButtonAwayFrom(clientX, clientY) {
-      const now = performance.now();
-      if (now - lastMove < COOLDOWN_MS) return;
-      lastMove = now;
-
-      const row = btnRow.getBoundingClientRect();
-      const btn = noBtn.getBoundingClientRect();
-
-      // Current button center in row coordinates
-      const btnCx = (btn.left + btn.width / 2) - row.left;
-      const btnCy = (btn.top + btn.height / 2) - row.top;
-
-      // Cursor in row coordinates
-      const cursorX = clientX - row.left;
-      const cursorY = clientY - row.top;
-
-      // Vector from cursor -> button (push along this direction)
-      let dx = btnCx - cursorX;
-      let dy = btnCy - cursorY;
-
-      if (dx === 0 && dy === 0) {
-        dx = (Math.random() - 0.5);
-        dy = (Math.random() - 0.5);
-      }
-
-      const len = Math.hypot(dx, dy);
-      dx /= len;
-      dy /= len;
-
-      const push = 120;
-      const rand = 40;
-
-      const targetX = btnCx + dx * push + (Math.random() - 0.5) * rand;
-      const targetY = btnCy + dy * push + (Math.random() - 0.5) * rand;
-
-      const pad = 6;
-      const minX = pad + btn.width / 2;
-      const maxX = row.width - pad - btn.width / 2;
-      const minY = pad + btn.height / 2;
-      const maxY = row.height - pad - btn.height / 2;
-
-      const x = clamp(targetX, minX, maxX);
-      const y = clamp(targetY, minY, maxY);
-
-      // Set top-left in row coords
-      noBtn.style.left = `${x - btn.width / 2}px`;
-      noBtn.style.top  = `${y - btn.height / 2}px`;
-      noBtn.style.transform = "none";
-    }
-
-    // Desktop: dodge when cursor gets near the button
-    btnRow.addEventListener("mousemove", (e) => {
-      const btn = noBtn.getBoundingClientRect();
-      const cx = btn.left + btn.width / 2;
-      const cy = btn.top + btn.height / 2;
-      const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-
-      if (dist < DODGE_RADIUS) {
-        moveNoButtonAwayFrom(e.clientX, e.clientY);
-      }
-    });
-
-    // Desktop safety: if you actually hover it, move immediately
-    noBtn.addEventListener("mouseenter", (e) => {
-      moveNoButtonAwayFrom(e.clientX, e.clientY);
-    });
-
-    // Mobile + modern browsers: pointer events are most reliable
-    noBtn.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      moveNoButtonAwayFrom(e.clientX, e.clientY);
-    });
-
-    // Prevent click if it somehow happens
-    noBtn.addEventListener("click", (e) => e.preventDefault());
-
-    // --- YES button: confetti + new page ---
-    const yesBtn = document.getElementById("yesBtn");
-    const askPage = document.getElementById("askPage");
-    const lovePage = document.getElementById("lovePage");
-    const confettiCanvas = document.getElementById("confetti");
-    const roses = document.getElementById("roses");
-    const rosesGrid = document.getElementById("rosesGrid");
-
-    function buildRoses() {
-      rosesGrid.innerHTML = "";
-      const count = 120;
-      for (let i = 0; i < count; i++) {
-        const s = document.createElement("span");
-        s.textContent = (i % 7 === 0) ? "💐" : "🌹";
-        s.style.animationDelay = (Math.random() * 2) + "s";
-        s.style.opacity = (0.4 + Math.random() * 0.6).toFixed(2);
-        rosesGrid.appendChild(s);
-      }
-    }
-
-    function startConfetti(durationMs = 2400) {
-      confettiCanvas.style.display = "block";
-      const ctx = confettiCanvas.getContext("2d");
-      const DPR = Math.max(1, Math.floor(window.devicePixelRatio || 1));
-
-      function resize() {
-        confettiCanvas.width = Math.floor(window.innerWidth * DPR);
-        confettiCanvas.height = Math.floor(window.innerHeight * DPR);
-        confettiCanvas.style.width = window.innerWidth + "px";
-        confettiCanvas.style.height = window.innerHeight + "px";
-        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      }
-      resize();
-
-      const pieces = [];
-      const colors = ["#ff2d55", "#ff4d8d", "#ffd1dc", "#ffffff", "#ffb3c7"];
-
-      const makePiece = () => ({
-        x: Math.random() * window.innerWidth,
-        y: -20 - Math.random() * 200,
-        r: 4 + Math.random() * 6,
-        vx: -2 + Math.random() * 4,
-        vy: 2 + Math.random() * 5,
-        rot: Math.random() * Math.PI,
-        vr: -0.15 + Math.random() * 0.3,
-        c: colors[Math.floor(Math.random() * colors.length)],
-      });
-
-      for (let i = 0; i < 180; i++) pieces.push(makePiece());
-
-      let start = performance.now();
-      function frame(t) {
-        const elapsed = t - start;
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-        for (const p of pieces) {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.rot += p.vr;
-          p.vy += 0.02;
-
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot);
-          ctx.fillStyle = p.c;
-          ctx.fillRect(-p.r, -p.r/2, p.r*2, p.r);
-          ctx.restore();
-
-          if (p.y > window.innerHeight + 40) {
-            p.y = -20;
-            p.x = Math.random() * window.innerWidth;
-            p.vy = 2 + Math.random() * 5;
-          }
-        }
-
-        if (elapsed < durationMs) requestAnimationFrame(frame);
-        else {
-          confettiCanvas.style.display = "none";
-          ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        }
-      }
-
-      const onResize = () => resize();
-      window.addEventListener("resize", onResize, { passive: true });
-      requestAnimationFrame(frame);
-      setTimeout(() => window.removeEventListener("resize", onResize), durationMs + 250);
-    }
-
-    yesBtn.addEventListener("click", () => {
-      startConfetti();
-      askPage.style.display = "none";
-      lovePage.style.display = "block";
-      buildRoses();
-      roses.style.display = "block";
-    });
-  </script>
-</body>
-</html>
+        <h1 class="loveTitle">You are my Tukku!! 🌹</h1>
+<p class="loveMsg">I love you ❤️</p>
+</div>
+</div>
