@@ -7,13 +7,42 @@
   <style>
     :root { --bg1:#ffe6f0; --bg2:#fff; --text:#2b2b2b; }
     * { box-sizing: border-box; }
+
     body{
       margin:0; min-height:100vh; overflow:hidden;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       color:var(--text);
       background: radial-gradient(circle at 20% 20%, var(--bg2), var(--bg1));
     }
-    .wrap{ min-height:100vh; display:grid; place-items:center; padding:24px; }
+
+    /* ❤️ HEART BACKGROUND */
+    #hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:0;
+    }
+    .heart{
+      position:absolute;
+      font-size:22px;
+      opacity:0.35;
+      animation: floatUp linear infinite;
+    }
+    @keyframes floatUp{
+      from { transform: translateY(110vh) scale(0.8); }
+      to   { transform: translateY(-10vh) scale(1.2); }
+    }
+
+    .wrap{
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      position:relative;
+      z-index:1;
+    }
+
     .card{
       width:min(620px,92vw);
       background: rgba(255,255,255,0.88);
@@ -24,6 +53,7 @@
       text-align:center;
       position:relative;
     }
+
     h1{ margin:0 0 10px; font-size:clamp(28px,4vw,44px); letter-spacing:-0.02em; }
     p{ margin:0 0 18px; opacity:0.85; }
 
@@ -36,6 +66,7 @@
       gap:16px;
       margin-top:18px;
     }
+
     button{
       border:none;
       border-radius:999px;
@@ -48,6 +79,7 @@
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
     }
+
     #yesBtn{
       background: linear-gradient(135deg, #ff4d8d, #ff2d55);
       color:#fff;
@@ -77,6 +109,7 @@
       display:none;
       opacity:0.35;
       font-size:28px; line-height:1;
+      z-index:0;
     }
     #rosesGrid{
       position:absolute; inset:-20px;
@@ -89,18 +122,19 @@
       display:grid; place-items:center;
       animation: floaty 4s ease-in-out infinite;
     }
-    #rosesGrid span:nth-child(3n){ animation-duration:5.2s; }
-    #rosesGrid span:nth-child(4n){ animation-duration:6.0s; }
-    @keyframes floaty{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    @keyframes floaty{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-10px)}
+    }
 
-    /* Confetti canvas */
     #confetti{ position:fixed; inset:0; pointer-events:none; display:none; }
-
     .hint{ margin-top:16px; font-size:12px; opacity:0.55; }
   </style>
 </head>
+
 <body>
   <canvas id="confetti"></canvas>
+  <div id="hearts"></div>
   <div id="roses"><div id="rosesGrid"></div></div>
 
   <div class="wrap">
@@ -111,146 +145,10 @@
 
         <div class="btnRow" id="btnRow">
           <button id="yesBtn">Yes 💖</button>
-          <button id="noBtn" aria-label="No button">No 🙈</button>
+          <button id="noBtn">No 🙈</button>
         </div>
 
+        <div class="hint">On mobile, try tapping “No” 😉</div>
       </div>
 
-      <div id="lovePage">
-        <h1 class="loveTitle">BABY KUTTA!! 🌹</h1>
-        <p class="loveMsg">I love you ❤️</p>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // --- NO button runs away ---
-    const noBtn = document.getElementById("noBtn");
-    const btnRow = document.getElementById("btnRow");
-
-    function moveNoButton() {
-      const rowRect = btnRow.getBoundingClientRect();
-      const btnRect = noBtn.getBoundingClientRect();
-
-      const maxX = rowRect.width - btnRect.width;
-      const maxY = rowRect.height - btnRect.height;
-
-      const x = Math.max(0, Math.random() * maxX);
-      const y = Math.max(0, Math.random() * maxY);
-
-      noBtn.style.left = `${x}px`;
-      noBtn.style.top = `${y}px`;
-      noBtn.style.transform = "none";
-    }
-
-    noBtn.addEventListener("mouseenter", moveNoButton);
-    noBtn.addEventListener("focus", moveNoButton);
-
-    noBtn.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      moveNoButton();
-    }, { passive: false });
-
-    noBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      moveNoButton();
-    });
-
-    // --- YES button: confetti + new page ---
-    const yesBtn = document.getElementById("yesBtn");
-    const askPage = document.getElementById("askPage");
-    const lovePage = document.getElementById("lovePage");
-    const confettiCanvas = document.getElementById("confetti");
-    const roses = document.getElementById("roses");
-    const rosesGrid = document.getElementById("rosesGrid");
-
-    function buildRoses() {
-      rosesGrid.innerHTML = "";
-      const count = 120;
-      for (let i = 0; i < count; i++) {
-        const s = document.createElement("span");
-        s.textContent = (i % 7 === 0) ? "💐" : "🌹";
-        s.style.animationDelay = (Math.random() * 2) + "s";
-        s.style.opacity = (0.4 + Math.random() * 0.6).toFixed(2);
-        rosesGrid.appendChild(s);
-      }
-    }
-
-    function startConfetti(durationMs = 2400) {
-      confettiCanvas.style.display = "block";
-      const ctx = confettiCanvas.getContext("2d");
-      const DPR = Math.max(1, Math.floor(window.devicePixelRatio || 1));
-
-      function resize() {
-        confettiCanvas.width = Math.floor(window.innerWidth * DPR);
-        confettiCanvas.height = Math.floor(window.innerHeight * DPR);
-        confettiCanvas.style.width = window.innerWidth + "px";
-        confettiCanvas.style.height = window.innerHeight + "px";
-        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      }
-      resize();
-
-      const pieces = [];
-      const colors = ["#ff2d55", "#ff4d8d", "#ffd1dc", "#ffffff", "#ffb3c7"];
-
-      const makePiece = () => ({
-        x: Math.random() * window.innerWidth,
-        y: -20 - Math.random() * 200,
-        r: 4 + Math.random() * 6,
-        vx: -2 + Math.random() * 4,
-        vy: 2 + Math.random() * 5,
-        rot: Math.random() * Math.PI,
-        vr: -0.15 + Math.random() * 0.3,
-        c: colors[Math.floor(Math.random() * colors.length)],
-      });
-
-      for (let i = 0; i < 180; i++) pieces.push(makePiece());
-
-      let start = performance.now();
-      function frame(t) {
-        const elapsed = t - start;
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-        for (const p of pieces) {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.rot += p.vr;
-          p.vy += 0.02;
-
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot);
-          ctx.fillStyle = p.c;
-          ctx.fillRect(-p.r, -p.r/2, p.r*2, p.r);
-          ctx.restore();
-
-          if (p.y > window.innerHeight + 40) {
-            p.y = -20;
-            p.x = Math.random() * window.innerWidth;
-            p.vy = 2 + Math.random() * 5;
-          }
-        }
-
-        if (elapsed < durationMs) requestAnimationFrame(frame);
-        else {
-          confettiCanvas.style.display = "none";
-          ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        }
-      }
-
-      const onResize = () => resize();
-      window.addEventListener("resize", onResize, { passive: true });
-      requestAnimationFrame(frame);
-      setTimeout(() => window.removeEventListener("resize", onResize), durationMs + 250);
-    }
-
-    yesBtn.addEventListener("click", () => {
-      startConfetti();
-      askPage.style.display = "none";
-      lovePage.style.display = "block";
-      buildRoses();
-      roses.style.display = "block";
-    });
-  </script>
-</body>
-</html>
+      <div id="l
