@@ -55,14 +55,16 @@
     }
     #yesBtn:hover{ transform: translateY(-1px) scale(1.02); }
 
+    /* UPDATED: better positioning + performance hints */
     #noBtn{
       background:#f2f2f2;
       color:#333;
       min-width:130px;
       position:absolute;
-      left:50%;
-      top:10px;
-      transform: translateX(80px);
+      left: calc(50% + 90px);
+      top: 14px;
+      transform: translateX(-50%);
+      will-change: left, top, transform;
     }
 
     /* “New page” section */
@@ -118,44 +120,100 @@
       </div>
 
       <div id="lovePage">
-        <h1 class="loveTitle">You are my Tukku!! 🌹</h1>
+        <h1 class="loveTitle">YAY!! 🌹</h1>
         <p class="loveMsg">I love you ❤️</p>
       </div>
     </div>
   </div>
 
   <script>
-    // --- NO button runs away ---
+    // --- NO button runs away (UPGRADED: proximity dodge + mobile-friendly pointer events) ---
     const noBtn = document.getElementById("noBtn");
     const btnRow = document.getElementById("btnRow");
 
-    function moveNoButton() {
-      const rowRect = btnRow.getBoundingClientRect();
-      const btnRect = noBtn.getBoundingClientRect();
+    let lastMove = 0;
+    const COOLDOWN_MS = 120;   // prevents jitter
+    const DODGE_RADIUS = 90;   // how close your cursor gets before it flees
 
-      const maxX = rowRect.width - btnRect.width;
-      const maxY = rowRect.height - btnRect.height;
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
 
-      const x = Math.max(0, Math.random() * maxX);
-      const y = Math.max(0, Math.random() * maxY);
+    function moveNoButtonAwayFrom(clientX, clientY) {
+      const now = performance.now();
+      if (now - lastMove < COOLDOWN_MS) return;
+      lastMove = now;
 
-      noBtn.style.left = `${x}px`;
-      noBtn.style.top = `${y}px`;
+      const row = btnRow.getBoundingClientRect();
+      const btn = noBtn.getBoundingClientRect();
+
+      // Current button center in row coordinates
+      const btnCx = (btn.left + btn.width / 2) - row.left;
+      const btnCy = (btn.top + btn.height / 2) - row.top;
+
+      // Cursor in row coordinates
+      const cursorX = clientX - row.left;
+      const cursorY = clientY - row.top;
+
+      // Vector from cursor -> button (push along this direction)
+      let dx = btnCx - cursorX;
+      let dy = btnCy - cursorY;
+
+      if (dx === 0 && dy === 0) {
+        dx = (Math.random() - 0.5);
+        dy = (Math.random() - 0.5);
+      }
+
+      const len = Math.hypot(dx, dy);
+      dx /= len;
+      dy /= len;
+
+      const push = 120;
+      const rand = 40;
+
+      const targetX = btnCx + dx * push + (Math.random() - 0.5) * rand;
+      const targetY = btnCy + dy * push + (Math.random() - 0.5) * rand;
+
+      const pad = 6;
+      const minX = pad + btn.width / 2;
+      const maxX = row.width - pad - btn.width / 2;
+      const minY = pad + btn.height / 2;
+      const maxY = row.height - pad - btn.height / 2;
+
+      const x = clamp(targetX, minX, maxX);
+      const y = clamp(targetY, minY, maxY);
+
+      // Set top-left in row coords
+      noBtn.style.left = `${x - btn.width / 2}px`;
+      noBtn.style.top  = `${y - btn.height / 2}px`;
       noBtn.style.transform = "none";
     }
 
-    noBtn.addEventListener("mouseenter", moveNoButton);
-    noBtn.addEventListener("focus", moveNoButton);
+    // Desktop: dodge when cursor gets near the button
+    btnRow.addEventListener("mousemove", (e) => {
+      const btn = noBtn.getBoundingClientRect();
+      const cx = btn.left + btn.width / 2;
+      const cy = btn.top + btn.height / 2;
+      const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
 
-    noBtn.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      moveNoButton();
-    }, { passive: false });
-
-    noBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      moveNoButton();
+      if (dist < DODGE_RADIUS) {
+        moveNoButtonAwayFrom(e.clientX, e.clientY);
+      }
     });
+
+    // Desktop safety: if you actually hover it, move immediately
+    noBtn.addEventListener("mouseenter", (e) => {
+      moveNoButtonAwayFrom(e.clientX, e.clientY);
+    });
+
+    // Mobile + modern browsers: pointer events are most reliable
+    noBtn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      moveNoButtonAwayFrom(e.clientX, e.clientY);
+    });
+
+    // Prevent click if it somehow happens
+    noBtn.addEventListener("click", (e) => e.preventDefault());
 
     // --- YES button: confetti + new page ---
     const yesBtn = document.getElementById("yesBtn");
